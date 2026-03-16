@@ -25,8 +25,24 @@ router.register(r'workouts', views.WorkoutViewSet)
 router.register(r'activities', views.ActivityViewSet)
 router.register(r'leaderboard', views.LeaderboardViewSet)
 
+import os
+from django.http import JsonResponse
+
+def api_url_info(request):
+    codespace_name = os.environ.get('CODESPACE_NAME', 'localhost')
+    base_url = f'https://{codespace_name}-8000.app.github.dev' if codespace_name != 'localhost' else 'http://localhost:8000'
+    endpoints = {
+        'users': f'{base_url}/api/users/',
+        'teams': f'{base_url}/api/teams/',
+        'workouts': f'{base_url}/api/workouts/',
+        'activities': f'{base_url}/api/activities/',
+        'leaderboard': f'{base_url}/api/leaderboard/',
+    }
+    return JsonResponse({'api_endpoints': endpoints})
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', api_url_info, name='api_url_info'),
     path('', views.api_root, name='api_root'),
     path('', include(router.urls)),
 ]
